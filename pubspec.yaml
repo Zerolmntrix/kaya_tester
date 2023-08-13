@@ -14,6 +14,15 @@ dependencies:
       url: https://github.com/Zerolmntrix/kagayaku-modules.git
       ref: dev
 
+  #ui
+  phosphor_flutter: ^2.0.0
+  dotted_border: ^2.0.0
+  another_flushbar: ^1.12.30
+
+  #core
+  file_picker: ^5.3.3
+  archive: ^3.3.7
+
 dev_dependencies:
   flutter_lints: ^2.0.2
 
