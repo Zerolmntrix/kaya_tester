@@ -1,12 +1,10 @@
 import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-import '../constants.dart';
+import '../models/module.dart';
+import '../utils/constants.dart';
 
 class FileCard extends StatelessWidget {
   const FileCard(
@@ -16,16 +14,16 @@ class FileCard extends StatelessWidget {
     required this.onRemove,
   });
 
-  final ModuleFile module;
+  final Module module;
   final double progress;
   final VoidCallback onRemove;
 
   @override
   Widget build(BuildContext context) {
+    final moduleIcon = module.icon?.content;
+    final moduleInfo = module.info?.content;
+
     final progressString = (progress * 100).toStringAsFixed(0);
-    final moduleIcon = module.icon.content as Uint8List;
-    final moduleFile = module.file.content as Uint8List;
-    final moduleInfo = module.info.content as Uint8List;
 
     final jsonString = utf8.decode(moduleInfo);
     final moduleData = json.decode(jsonString) as Map<String, dynamic>;
@@ -121,16 +119,4 @@ class FileCard extends StatelessWidget {
       ),
     );
   }
-}
-
-class ModuleFile {
-  ModuleFile({
-    required this.file,
-    required this.info,
-    required this.icon,
-  });
-
-  final ArchiveFile file;
-  final ArchiveFile info;
-  final ArchiveFile icon;
 }
