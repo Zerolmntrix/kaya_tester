@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kagayaku_modules/kagayaku_modules.dart';
 
 import '../models/module.dart';
 import '../utils/constants.dart';
@@ -12,6 +13,8 @@ class ModuleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+
+    final info = module.info;
 
     return MyCard(
       child: Column(
@@ -28,7 +31,7 @@ class ModuleCard extends StatelessWidget {
           ),
           const SizedBox(height: 16.0),
           Text(
-            module.info['name'] ?? 'Unknown',
+            info.name,
             style: textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.w500,
             ),
@@ -44,7 +47,7 @@ class ModuleCard extends StatelessWidget {
                       style: textTheme.labelMedium,
                     ),
                     Text(
-                      module.info['language'] ?? 'Unknown',
+                      Languages.get(info.language),
                       style: textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w500,
                       ),
@@ -67,7 +70,7 @@ class ModuleCard extends StatelessWidget {
                       style: textTheme.labelMedium,
                     ),
                     Text(
-                      module.info['developer'] ?? 'Unknown',
+                      info.developer,
                       style: textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w500,
                       ),

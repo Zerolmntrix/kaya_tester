@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:archive/archive.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:kagayaku_modules/kagayaku_modules.dart';
 
 import '../widgets/show_msg.dart';
 
@@ -9,7 +10,7 @@ class Module {
   Module(this._context, this._archive) {
     _file = _getFile('module.kaya');
     _info = _getFile('info.json');
-    _icon = _getFile(info['icon']);
+    _icon = _getFile(info.icon);
   }
 
   final Archive _archive;
@@ -23,14 +24,19 @@ class Module {
 
   get icon => _icon?.content;
 
-  Map<String, dynamic> get info {
-    final moduleInfoEncoded = _info?.content;
+  ModuleInfo get info {
+    final encodedInfo = _info?.content;
+    ModuleInfo moduleInfo = ModuleInfo.fromJson({});
 
-    if (moduleInfoEncoded == null) return {};
+    try {
+      final jsonString = utf8.decode(encodedInfo);
+      moduleInfo = ModuleInfo.fromJson(json.decode(jsonString));
+    } catch (e) {
+      showMessage(_context, 'Error parsing info.json: $e');
+      rethrow;
+    }
 
-    final jsonString = utf8.decode(moduleInfoEncoded);
-
-    return json.decode(jsonString);
+    return moduleInfo;
   }
 
   ArchiveFile? _getFile(String filename) {

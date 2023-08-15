@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
       progress = 0.0;
       canGo = false;
     });
-    Timer.periodic(const Duration(milliseconds: 10), (timer) {
+    Timer.periodic(const Duration(milliseconds: 5), (timer) {
       setState(() => progress += 0.01);
       if (progress >= 1) {
         timer.cancel();

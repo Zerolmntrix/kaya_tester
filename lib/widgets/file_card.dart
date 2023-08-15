@@ -64,14 +64,14 @@ class FileCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  moduleInfo['name'] ?? 'Unknown module',
+                  moduleInfo.name,
                   style: const TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  moduleInfo['developer'] ?? 'Unknown developer',
+                  moduleInfo.developer,
                   style: const TextStyle(
                     color: kTextColor,
                   ),

@@ -1,9 +1,10 @@
 part of '../screens/tests.dart';
 
 class TestCard extends StatefulWidget {
-  const TestCard({super.key, required this.title});
+  const TestCard({super.key, required this.title, required this.test});
 
   final String title;
+  final NovelFunction Function() test;
 
   @override
   State<TestCard> createState() => _TestCardState();
@@ -15,7 +16,7 @@ class _TestCardState extends State<TestCard> {
   @override
   void initState() {
     super.initState();
-    _TestManager().testCardStates.add(this);
+    _TestManager().addTest(this);
   }
 
   @override
@@ -57,7 +58,7 @@ class _TestCardState extends State<TestCard> {
               const SizedBox(width: 8.0),
               testStatus == TestStatus.running
                   ? const _Loading()
-                  : _ActionButton(status: testStatus, onPressed: startTest),
+                  : _ActionButton(status: testStatus, onPressed: start),
             ],
           ),
         ],
@@ -65,12 +66,16 @@ class _TestCardState extends State<TestCard> {
     );
   }
 
-  startTest() {
+  start() async {
     setState(() => testStatus = TestStatus.running);
 
-    Future.delayed(const Duration(seconds: 2), () {
+    final resultIsOK = isOk(await widget.test());
+
+    if (resultIsOK) {
+      setState(() => testStatus = TestStatus.passed);
+    } else {
       setState(() => testStatus = TestStatus.failed);
-    });
+    }
   }
 }
 
