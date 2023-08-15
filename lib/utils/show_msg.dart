@@ -1,7 +1,7 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 
-import '../utils/constants.dart';
+import 'constants.dart';
 
 void showMessage(BuildContext context, String msg) {
   Flushbar(

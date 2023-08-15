@@ -11,7 +11,8 @@ class TestCard extends StatefulWidget {
 }
 
 class _TestCardState extends State<TestCard> {
-  TestStatus testStatus = TestStatus.notStarted;
+  final List<NovelModel> novels = [];
+  TestStatus status = TestStatus.notStarted;
 
   @override
   void initState() {
@@ -24,8 +25,9 @@ class _TestCardState extends State<TestCard> {
     final textTheme = Theme.of(context).textTheme;
 
     Icon statusIcon;
+    bool hasResult = status == TestStatus.passed || status == TestStatus.failed;
 
-    switch (testStatus) {
+    switch (status) {
       case TestStatus.passed:
         statusIcon = const Icon(Icons.check_circle, color: Colors.green);
         break;
@@ -48,17 +50,16 @@ class _TestCardState extends State<TestCard> {
           ),
           Row(
             children: [
-              if (testStatus == TestStatus.passed)
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.remove_red_eye),
-                ),
+              IconButton(
+                onPressed: hasResult ? showResult : null,
+                icon: const Icon(Icons.remove_red_eye),
+              ),
               const SizedBox(width: 8.0),
               statusIcon,
               const SizedBox(width: 8.0),
-              testStatus == TestStatus.running
+              status == TestStatus.running
                   ? const _Loading()
-                  : _ActionButton(status: testStatus, onPressed: start),
+                  : _ActionButton(status: status, onPressed: start),
             ],
           ),
         ],
@@ -67,15 +68,33 @@ class _TestCardState extends State<TestCard> {
   }
 
   start() async {
-    setState(() => testStatus = TestStatus.running);
+    setState(() => status = TestStatus.running);
+
+    final novels = await widget.test();
+
+    setState(() => this.novels.addAll(novels));
 
     final resultIsOK = isOk(await widget.test());
 
     if (resultIsOK) {
-      setState(() => testStatus = TestStatus.passed);
+      setState(() => status = TestStatus.passed);
     } else {
-      setState(() => testStatus = TestStatus.failed);
+      setState(() => status = TestStatus.failed);
     }
+  }
+
+  showResult() {
+    final double screenWidth = MediaQuery.of(context).size.width;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Modal(
+          title: widget.title,
+          content: buildGridResult(novels, screenWidth),
+        );
+      },
+    );
   }
 }
 

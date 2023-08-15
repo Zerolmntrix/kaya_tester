@@ -6,9 +6,10 @@ import '../utils/constants.dart';
 import 'card.dart';
 
 class ModuleCard extends StatelessWidget {
-  const ModuleCard(this.module, {super.key});
+  const ModuleCard(this.module, {super.key, required this.controls});
 
   final Module module;
+  final Row Function() controls;
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +81,8 @@ class ModuleCard extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 30),
+          controls(),
           const SizedBox(height: 30),
         ],
       ),

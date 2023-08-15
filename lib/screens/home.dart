@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../models/module.dart';
 import '../utils/constants.dart';
+import '../utils/show_msg.dart';
 import '../widgets/file_card.dart';
 import '../widgets/uploader.dart';
 import 'tests.dart';
@@ -25,8 +26,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: SizedBox(
+        child: Container(
           width: 400.0,
+          margin: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -42,8 +44,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       const Text('No module imported yet.'),
                     ],
                   ),
-                ),
-              if (module != null)
+                )
+              else
                 FileCard(
                   module!,
                   progress: progress,
@@ -79,6 +81,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void goToTests() {
+    if (module!.info.baseUrl.isEmpty) {
+      showMessage(context, 'Base url not found in info.json');
+      return;
+    }
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(

@@ -6,7 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../models/module.dart';
 import '../utils/constants.dart';
-import 'show_msg.dart';
+import '../utils/show_msg.dart';
 
 class Uploader extends StatefulWidget {
   const Uploader({super.key, required this.onUpload});

@@ -4,7 +4,7 @@ import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
 import 'package:kagayaku_modules/kagayaku_modules.dart';
 
-import '../widgets/show_msg.dart';
+import '../utils/show_msg.dart';
 
 class Module {
   Module(this._context, this._archive) {
