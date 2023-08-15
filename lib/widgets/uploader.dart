@@ -111,7 +111,7 @@ class _UploaderState extends State<Uploader> {
     }
   }
 
-  void rejectFile(dynamic _) async {
+  void rejectFile(dynamic _) {
     showMessage(context, 'Only .zip files are allowed.');
   }
 }

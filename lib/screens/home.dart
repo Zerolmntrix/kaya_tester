@@ -6,6 +6,7 @@ import '../models/module.dart';
 import '../utils/constants.dart';
 import '../widgets/file_card.dart';
 import '../widgets/uploader.dart';
+import 'tests.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -77,7 +78,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void goToTests() {}
+  void goToTests() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TestsScreen(module!),
+      ),
+    );
+  }
 
   void startLoading() {
     setState(() {

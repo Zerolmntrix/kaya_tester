@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -20,13 +18,10 @@ class FileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final moduleIcon = module.icon?.content;
-    final moduleInfo = module.info?.content;
+    final moduleIcon = module.icon;
+    final moduleInfo = module.info;
 
     final progressString = (progress * 100).toStringAsFixed(0);
-
-    final jsonString = utf8.decode(moduleInfo);
-    final moduleData = json.decode(jsonString) as Map<String, dynamic>;
 
     return Container(
       height: 72.0,
@@ -55,7 +50,10 @@ class FileCard extends StatelessWidget {
             child: Image.memory(
               moduleIcon,
               errorBuilder: (BuildContext ctx, Object ex, StackTrace? _) {
-                return const Icon(Icons.file_copy, color: kSecondaryColor);
+                return const Icon(
+                  Icons.image_not_supported_outlined,
+                  color: kSecondaryColor,
+                );
               },
             ),
           ),
@@ -66,14 +64,14 @@ class FileCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  moduleData['developer'] ?? 'Unknown developer',
+                  moduleInfo['name'] ?? 'Unknown module',
                   style: const TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  moduleData['baseUrl'] ?? 'Unknown url',
+                  moduleInfo['developer'] ?? 'Unknown developer',
                   style: const TextStyle(
                     color: kTextColor,
                   ),
