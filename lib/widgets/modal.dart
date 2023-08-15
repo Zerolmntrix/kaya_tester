@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 
+import '../screens/tests.dart';
 import '../utils/constants.dart';
 
 class Modal extends StatelessWidget {
-  const Modal(
-      {super.key, required this.title, required this.content, this.leading});
+  const Modal({
+    super.key,
+    required this.title,
+    required this.content,
+    this.leading,
+    required this.result,
+  });
 
   final String title;
   final Widget? leading;
   final GridView content;
+  final TestResult result;
 
   @override
   Widget build(BuildContext context) {
@@ -60,9 +67,61 @@ class Modal extends StatelessWidget {
                 const SizedBox(height: 24.0),
                 if (leading != null) ...[
                   leading!,
-                  const SizedBox(width: 16.0),
+                  const SizedBox(height: 16.0),
                 ],
-                Expanded(child: content),
+                if (result.success && result.message != null) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0,
+                      vertical: 4.0,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: Colors.redAccent,
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                    ),
+                    child: Text(
+                      'The are some data missing. Please check the console.',
+                      style: textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                ],
+                if (result.success)
+                  Expanded(child: content)
+                else ...[
+                  Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            color: kPrimaryColor,
+                            size: 120,
+                          ),
+                          const SizedBox(height: 16.0),
+                          Text(
+                            result.message!,
+                            style: textTheme.headlineSmall?.copyWith(
+                              color: kPrimaryColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            'Open the browser console for more details.',
+                            style: textTheme.labelSmall?.copyWith(
+                              color: kTextColor,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                ],
               ],
             ),
           ),

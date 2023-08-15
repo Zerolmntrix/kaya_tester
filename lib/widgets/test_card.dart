@@ -68,15 +68,24 @@ class _TestCardState extends State<TestCard> {
   }
 
   start() async {
+    TestResult isResultOK;
+
     setState(() => status = TestStatus.running);
 
-    final novels = await widget.test();
+    try {
+      final novels = await widget.test();
+      setState(() => this.novels
+        ..clear()
+        ..addAll(novels));
+    } catch (e) {
+      debugPrint(e.toString());
+    }
 
-    setState(() => this.novels.addAll(novels));
+    printInfo('Checking ${novels.length} novels from "${widget.title}"...');
+    isResultOK = isOk(novels, printWarnings: true);
+    printInfo('Test from "${widget.title}" finished');
 
-    final resultIsOK = isOk(await widget.test());
-
-    if (resultIsOK) {
+    if (isResultOK.success) {
       setState(() => status = TestStatus.passed);
     } else {
       setState(() => status = TestStatus.failed);
@@ -92,6 +101,7 @@ class _TestCardState extends State<TestCard> {
         return Modal(
           title: widget.title,
           content: buildGridResult(novels, screenWidth),
+          result: isOk(novels),
         );
       },
     );

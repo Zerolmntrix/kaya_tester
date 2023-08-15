@@ -5,6 +5,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../models/module.dart';
 import '../utils/constants.dart';
 import '../utils/grid_result.dart';
+import '../utils/show_msg.dart';
 import '../widgets/card.dart';
 import '../widgets/modal.dart';
 import '../widgets/module_card.dart';
@@ -29,6 +30,12 @@ class _TestsScreenState extends State<TestsScreen> {
   void initState() {
     super.initState();
     _testManager.setModule(widget.module);
+  }
+
+  @override
+  void dispose() {
+    _testManager.dispose();
+    super.dispose();
   }
 
   @override

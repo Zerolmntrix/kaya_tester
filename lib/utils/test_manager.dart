@@ -2,6 +2,13 @@ part of '../screens/tests.dart';
 
 enum TestStatus { notStarted, running, passed, failed }
 
+class TestResult {
+  TestResult(this.success, [this.message]);
+
+  final bool success;
+  final String? message;
+}
+
 class _TestManager {
   static final _TestManager _instance = _TestManager._internal();
 
@@ -9,7 +16,7 @@ class _TestManager {
 
   _TestManager._internal();
 
-  late final KagayakuModule _module;
+  late KagayakuModule _module;
   final List<_TestCardState> _testCardStates = [];
 
   List<_TestCardState> get tests => _testCardStates;
@@ -31,32 +38,47 @@ class _TestManager {
 
     _module = KagayakuModule(source, moduleData.info.baseUrl);
   }
+
+  void dispose() {
+    _testCardStates.clear();
+  }
 }
 
-bool isOk(List<NovelModel> novels) {
-  if (novels.isEmpty) throw Exception('Novels list is empty');
+TestResult isOk(List<NovelModel> novels, {bool printWarnings = false}) {
+  String? message;
+
+  if (novels.isEmpty) return TestResult(false, 'Novels list is empty');
 
   for (final novel in novels) {
-    isNovelNotEmpty(novel);
+    final List<String> msgs = isNovelNotEmpty(novel);
+
+    if (msgs.isEmpty) continue;
+    message = 'Novel "${novel.title}" has missing data';
+
+    if (!printWarnings) continue;
+
+    printWarning(message);
+
+    for (final msg in msgs) {
+      printError(msg);
+    }
   }
 
-  return true;
+  return TestResult(true, message);
 }
 
-isSearchOk(List<NovelModel> novels, String search) {
-  isOk(novels);
+TestResult isSearchOk(List<NovelModel> novels, String search) {
+  return isOk(novels);
 }
 
-isNovelNotEmpty(NovelModel novel) {
-  if (novel.title.isEmpty) {
-    throw Exception('Novel title is empty');
-  }
+List<String> isNovelNotEmpty(NovelModel novel) {
+  final List<String> msgs = [];
 
-  if (novel.cover.isEmpty) {
-    throw Exception('Novel cover is empty');
-  }
+  if (novel.title.isEmpty) msgs.add('Title is empty');
 
-  if (novel.url.isEmpty) {
-    throw Exception('Novel url is empty');
-  }
+  if (novel.cover.isEmpty) msgs.add('Cover is empty');
+
+  if (novel.url.isEmpty) msgs.add('Url is empty');
+
+  return msgs;
 }

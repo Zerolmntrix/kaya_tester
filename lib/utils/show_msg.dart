@@ -16,3 +16,17 @@ void showMessage(BuildContext context, String msg) {
     borderRadius: BorderRadius.circular(8),
   ).show(context);
 }
+
+void printInfo(String text) {
+  print('\x1B[34m$text\x1B[0m');
+}
+
+void printWarning(String text) {
+  final String msg = 'Warning: $text';
+  print('\x1B[33m$msg\x1B[0m');
+}
+
+void printError(String text) {
+  final String msg = 'Error: $text';
+  print('\x1B[31m$msg\x1B[0m');
+}
