@@ -1,10 +1,21 @@
 part of '../screens/tests.dart';
 
 class TestCard extends StatefulWidget {
-  const TestCard({super.key, required this.title, required this.test});
+  const TestCard({super.key, required this.title, required this.test})
+      : settings = null,
+        testAdvanced = null;
+
+  const TestCard.advanced({
+    super.key,
+    required this.title,
+    required this.testAdvanced,
+    required this.settings,
+  }) : test = null;
 
   final String title;
-  final NovelFunction Function() test;
+  final NovelFunction Function()? test;
+  final NovelFunction Function(List<FormData> data)? testAdvanced;
+  final Map<String, String>? settings;
 
   @override
   State<TestCard> createState() => _TestCardState();
@@ -13,6 +24,9 @@ class TestCard extends StatefulWidget {
 class _TestCardState extends State<TestCard> {
   final List<NovelModel> novels = [];
   TestStatus status = TestStatus.notStarted;
+
+  List<FormData> formValues = [];
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -50,12 +64,19 @@ class _TestCardState extends State<TestCard> {
           ),
           Row(
             children: [
+              statusIcon,
+              const SizedBox(width: 8.0),
+              if (widget.settings != null) ...[
+                IconButton(
+                  onPressed: openSettings,
+                  icon: const Icon(Icons.settings),
+                ),
+                const SizedBox(width: 8.0),
+              ],
               IconButton(
                 onPressed: hasResult ? showResult : null,
                 icon: const Icon(Icons.remove_red_eye),
               ),
-              const SizedBox(width: 8.0),
-              statusIcon,
               const SizedBox(width: 8.0),
               status == TestStatus.running
                   ? const _Loading()
@@ -70,10 +91,17 @@ class _TestCardState extends State<TestCard> {
   start() async {
     TestResult isResultOK;
 
+    if (widget.settings != null && formValues.isEmpty) {
+      if (!await openSettings()) return;
+    }
+
     setState(() => status = TestStatus.running);
 
     try {
-      final novels = await widget.test();
+      final novels = widget.testAdvanced != null
+          ? await widget.testAdvanced!(formValues)
+          : await widget.test!();
+
       setState(() => this.novels
         ..clear()
         ..addAll(novels));
@@ -105,6 +133,64 @@ class _TestCardState extends State<TestCard> {
         );
       },
     );
+  }
+
+  openSettings() async {
+    late bool canTest;
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Settings for "${widget.title}"'),
+          content: Form(
+            key: _formKey,
+            child: SizedBox(
+              width: 400.0,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: widget.settings!.entries.map((entry) {
+                  final initial = formValues
+                      .firstWhere((e) => e.key == entry.key,
+                          orElse: () => FormData(entry.key, ''))
+                      .value;
+
+                  return buildFormField(entry, initial, (key, value) {
+                    formValues.add(FormData(key, value));
+                  });
+                }).toList(),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                canTest = false;
+
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (!_formKey.currentState!.validate()) return;
+
+                formValues.clear();
+
+                _formKey.currentState!.save();
+
+                canTest = true;
+
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return canTest;
   }
 }
 

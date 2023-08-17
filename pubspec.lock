@@ -106,10 +106,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_dropzone_web
-      sha256: faff2fbb0531e612c036fcce89424d221f70914b40e828e03501f75c0a54113c
+      sha256: "31f9bb515989163a584a8acd0299dafb67ab4470e0633b06106fcbbb16841c1a"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.11"
+    version: "3.0.12"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -152,10 +152,10 @@ packages:
     description:
       path: "."
       ref: dev
-      resolved-ref: "849bf4be60d4df0d967ce3e93af5ab7cc361b7ef"
+      resolved-ref: da4da5ea2f5dca375ad5e6f485dd20b0a297990c
       url: "https://github.com/Zerolmntrix/kagayaku-modules.git"
     source: git
-    version: "1.0.2"
+    version: "1.0.3"
   lints:
     dependency: transitive
     description:
@@ -237,10 +237,10 @@ packages:
     dependency: transitive
     description:
       name: source_span
-      sha256: dd904f795d4b4f3b870833847c461801f6750a9fa8e61ea5ac53f9422b31f250
+      sha256: "53e943d4206a5e30df338fd4c6e7a077e02254531b138a15aec3bd143c1a8b3c"
       url: "https://pub.dev"
     source: hosted
-    version: "1.9.1"
+    version: "1.10.0"
   string_scanner:
     dependency: transitive
     description:

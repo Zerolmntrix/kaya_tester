@@ -9,6 +9,7 @@ import '../utils/show_msg.dart';
 import '../widgets/card.dart';
 import '../widgets/modal.dart';
 import '../widgets/module_card.dart';
+import '../widgets/settings.dart';
 import 'home.dart';
 
 part '../utils/test_manager.dart';
@@ -40,6 +41,8 @@ class _TestsScreenState extends State<TestsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final module = _testManager.module;
+
     return Scaffold(
       body: Center(
         child: ListView(
@@ -52,20 +55,32 @@ class _TestsScreenState extends State<TestsScreen> {
                 child: Column(
                   children: [
                     ModuleCard(widget.module, controls: buidControls),
-                    const SizedBox(height: 20),
+                    buildTitle('Basic tests'),
                     TestCard(
                       title: 'Spotlight',
-                      test: _testManager.module.getSpotlightNovels,
+                      test: module.getSpotlightNovels,
                     ),
-                    const SizedBox(height: 16),
                     TestCard(
                       title: 'Latest',
-                      test: _testManager.module.getLatestNovels,
+                      test: module.getLatestNovels,
                     ),
-                    const SizedBox(height: 16),
                     TestCard(
                       title: 'Popular',
-                      test: _testManager.module.getPopularNovels,
+                      test: module.getPopularNovels,
+                    ),
+                    buildTitle('Advanced tests'),
+                    TestCard.advanced(
+                      title: 'Search',
+                      settings: const {'query': 'text'},
+                      testAdvanced: (data) {
+                        final query = data.firstWhere((e) => e.key == 'query');
+
+                        return module.getNovelsBySearch(query.value);
+                      },
+                    ),
+                    TestCard(
+                      title: 'Novel details',
+                      test: module.getSpotlightNovels,
                     ),
                   ],
                 ),
@@ -135,6 +150,22 @@ class _TestsScreenState extends State<TestsScreen> {
             ),
           ),
         ),
+      ],
+    );
+  }
+
+  Column buildTitle(String title) {
+    return Column(
+      children: [
+        const SizedBox(height: 4.0),
+        Text(
+          title,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: 8.0),
+        const Divider(),
       ],
     );
   }

@@ -10,7 +10,7 @@ class Module {
   Module(this._context, this._archive) {
     _file = _getFile('module.kaya');
     _info = _getFile('info.json');
-    _icon = _getFile(info.icon);
+    _icon = _info != null ? _getFile(info.icon) : null;
   }
 
   final Archive _archive;
@@ -28,11 +28,13 @@ class Module {
     final encodedInfo = _info?.content;
     ModuleInfo moduleInfo = ModuleInfo.fromJson({});
 
+    if (encodedInfo == null) return moduleInfo;
+
     try {
       final jsonString = utf8.decode(encodedInfo);
       moduleInfo = ModuleInfo.fromJson(json.decode(jsonString));
     } catch (e) {
-      showMessage(_context, 'Error parsing info.json: $e');
+      showMessage(_context, 'Error while parsing info.json: $e');
       rethrow;
     }
 
