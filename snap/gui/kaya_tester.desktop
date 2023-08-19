@@ -1,0 +1,8 @@
+[Desktop Entry]
+  Name=Kaya Tester
+  Comment=Tester of source modules for the Kagayaku app.
+  Exec=kaya-tester
+  Icon=${SNAP}/meta/gui/icon.png
+  Terminal=false
+  Type=Application
+  Categories=Development;
