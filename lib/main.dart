@@ -1,8 +1,14 @@
+import 'package:desktop_window/desktop_window.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import 'screens/home.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (!kIsWeb) await DesktopWindow.setMinWindowSize(const Size(1000, 600));
+
   runApp(const MyApp());
 }
 

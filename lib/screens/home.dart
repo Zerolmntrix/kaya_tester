@@ -28,11 +28,12 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Center(
         child: Container(
           width: 400.0,
+          height: 400.0,
           margin: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Spacer(),
               if (module == null)
                 Expanded(
                   child: Column(
@@ -55,10 +56,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ElevatedButton(
                 onPressed: canGo ? goToTests : null,
                 style: ElevatedButton.styleFrom(backgroundColor: kPrimaryColor),
-                child:
-                    const Text('Next', style: TextStyle(color: kNeutralColor)),
+                child: const Text(
+                  'Next',
+                  style: TextStyle(color: kNeutralColor),
+                ),
               ),
-              const Spacer()
             ],
           ),
         ),
@@ -82,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void goToTests() {
     if (module!.info.baseUrl.isEmpty) {
-      showMessage(context, 'Base url not found in info.json');
+      showMessage(context, 'Base url not found in info.json', isError: true);
       return;
     }
 

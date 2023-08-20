@@ -1,16 +1,21 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import 'constants.dart';
 
-void showMessage(BuildContext context, String msg) {
+void showMessage(BuildContext context, String msg, {bool isError = false}) {
   Flushbar(
-    icon: const Icon(Icons.info_outline, size: 28.0, color: kPrimaryColor),
+    icon: Icon(
+      isError ? PhosphorIcons.regular.xCircle : Icons.info_outline,
+      size: 28.0,
+      color: isError ? kErrorColor : kPrimaryColor,
+    ),
     maxWidth: 350,
     flushbarPosition: FlushbarPosition.TOP,
     flushbarStyle: FlushbarStyle.FLOATING,
     message: msg,
-    leftBarIndicatorColor: kPrimaryColor,
+    leftBarIndicatorColor: isError ? kErrorColor : kPrimaryColor,
     duration: const Duration(seconds: 3),
     margin: const EdgeInsets.all(12),
     borderRadius: BorderRadius.circular(8),

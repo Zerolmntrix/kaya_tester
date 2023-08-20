@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:archive/archive.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:super_drag_and_drop/super_drag_and_drop.dart';
 
 import '../models/module.dart';
 import '../utils/constants.dart';
@@ -18,100 +22,141 @@ class Uploader extends StatefulWidget {
 }
 
 class _UploaderState extends State<Uploader> {
-  late DropzoneViewController controller;
-
   bool isHovering = false;
+  FilePickerStatus status = FilePickerStatus.done;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        DropzoneView(
-          mime: kValidMime,
-          onDrop: acceptFile,
-          onDropInvalid: rejectFile,
-          onCreated: (ctrl) => controller = ctrl,
-          onHover: () => setState(() => isHovering = true),
-          onLeave: () => setState(() => isHovering = false),
-        ),
-        DottedBorder(
-          borderType: BorderType.RRect,
-          dashPattern: const [8, 4],
-          radius: const Radius.circular(12),
-          color: isHovering ? kPrimaryColor : kTextColor,
-          child: InkWell(
-            onTap: pickCompactedModule,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 32.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-                color: kNeutralColor,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  PhosphorIcon(
-                    PhosphorIcons.regular.cloudArrowUp,
-                    size: 64.0,
+    return DropRegion(
+      formats: Formats.standardFormats,
+      hitTestBehavior: HitTestBehavior.opaque,
+      onDropOver: (event) => DropOperation.copy,
+      onDropEnter: (event) => setState(() => isHovering = true),
+      onDropLeave: (event) => setState(() => isHovering = false),
+      onPerformDrop: (event) async {
+        final reader = event.session.items.first.dataReader!;
+
+        if (!reader.canProvide(Formats.zip)) rejectFile();
+
+        reader.getFile(Formats.zip, (file) async {
+          final stream = file.getStream();
+
+          acceptFile(await stream.toBytes());
+        });
+      },
+      child: DottedBorder(
+        borderType: BorderType.RRect,
+        strokeWidth: 2.0,
+        dashPattern: const [8, 4],
+        radius: const Radius.circular(12),
+        color: isHovering ? kPrimaryColor : kTextColor,
+        child: InkWell(
+          onTap: status == FilePickerStatus.done ? pickCompactedModule : null,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 32.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              color: kNeutralColor,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                PhosphorIcon(
+                  PhosphorIcons.regular.cloudArrowUp,
+                  size: 64.0,
+                  color: kPrimaryColor,
+                ),
+                const Text(
+                  'Import your module',
+                  style: TextStyle(
+                    fontSize: 18.0,
                     color: kPrimaryColor,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const Text(
-                    'Import your module',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      color: kPrimaryColor,
-                      fontWeight: FontWeight.bold,
-                    ),
+                ),
+                const SizedBox(height: 8.0),
+                const Text(
+                  'Drag and drop here or click to upload.',
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: kTextColor,
                   ),
-                  const SizedBox(height: 8.0),
-                  const Text(
-                    'Drag and drop here or click to upload.',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      color: kTextColor,
-                    ),
+                ),
+                const Text(
+                  'Only .zip files are allowed.',
+                  style: TextStyle(
+                    fontSize: 10.0,
+                    color: kTextColor,
                   ),
-                  const Text(
-                    'Only .zip files are allowed.',
-                    style: TextStyle(
-                      fontSize: 10.0,
-                      color: kTextColor,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 
   void pickCompactedModule() async {
-    final result = await controller.pickFiles(mime: kValidMime);
+    setState(() => status = FilePickerStatus.picking);
 
-    final zipFile = result.first;
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: [kValidMime],
+      dialogTitle: 'Select your module',
+      lockParentWindow: true,
+    );
 
-    if (!zipFile.name.endsWith('.zip')) return rejectFile(zipFile);
+    if (result == null) {
+      setState(() => status = FilePickerStatus.done);
+      return;
+    }
 
-    acceptFile(zipFile);
+    final PlatformFile zipFile = result.files.single;
+
+    if (!zipFile.name.endsWith('.$kValidMime')) return rejectFile();
+
+    if (kIsWeb) {
+      return acceptFile(zipFile.bytes!);
+    }
+
+    Uint8List zipBytes = await File(zipFile.path!).readAsBytes();
+
+    acceptFile(zipBytes);
   }
 
-  void acceptFile(dynamic event) async {
-    final data = await controller.getFileData(event);
+  void acceptFile(List<int> bytes) {
+    setState(() => status = FilePickerStatus.done);
 
-    final archive = ZipDecoder().decodeBytes(data);
+    final archive = ZipDecoder().decodeBytes(bytes);
 
-    if (context.mounted) {
-      final module = Module(context, archive);
-      if (!module.isOk()) return;
+    try {
+      final module = Module(archive);
+      if (!module.isOk()) throw Exception('Invalid module');
+
+      showMessage(context, 'Module imported successfully!');
 
       widget.onUpload(module);
+    } catch (e) {
+      showMessage(
+        context,
+        e.toString().replaceFirst('Exception:', 'Error:'),
+        isError: true,
+      );
     }
   }
 
-  void rejectFile(dynamic _) {
+  void rejectFile() {
     showMessage(context, 'Only .zip files are allowed.');
+  }
+}
+
+extension StreamBytes on Stream<Uint8List> {
+  Future<Uint8List> toBytes() async {
+    return await fold<Uint8List>(
+      Uint8List(0),
+      (Uint8List list, Uint8List data) => Uint8List.fromList(list + data),
+    );
   }
 }

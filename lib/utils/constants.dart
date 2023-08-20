@@ -5,5 +5,6 @@ const kSecondaryColor = Color(0xFFC1B2FA);
 const kAccentColor = Color(0xFFEAE2FD);
 const kNeutralColor = Color(0xFFF3F0FF);
 const kTextColor = Color(0xFF9892A6);
+const kErrorColor = Color(0xFFE74C3C);
 
-const kValidMime = ['application/zip'];
+const kValidMime = 'zip';

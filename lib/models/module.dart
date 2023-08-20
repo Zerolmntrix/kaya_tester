@@ -1,20 +1,16 @@
 import 'dart:convert';
 
 import 'package:archive/archive.dart';
-import 'package:flutter/material.dart';
 import 'package:kagayaku_modules/kagayaku_modules.dart';
 
-import '../utils/show_msg.dart';
-
 class Module {
-  Module(this._context, this._archive) {
+  Module(this._archive) {
     _file = _getFile('module.kaya');
     _info = _getFile('info.json');
     _icon = _info != null ? _getFile(info.icon) : null;
   }
 
   final Archive _archive;
-  final BuildContext _context;
 
   late final ArchiveFile? _file;
   late final ArchiveFile? _info;
@@ -34,8 +30,7 @@ class Module {
       final jsonString = utf8.decode(encodedInfo);
       moduleInfo = ModuleInfo.fromJson(json.decode(jsonString));
     } catch (e) {
-      showMessage(_context, 'Error while parsing info.json: $e');
-      rethrow;
+      throw Exception('Error parsing module info: $e');
     }
 
     return moduleInfo;
@@ -45,7 +40,7 @@ class Module {
     final moduleDir = _archive.fileName(0);
 
     final file = _archive.findFile('$moduleDir$filename');
-    if (file == null) showMessage(_context, 'File not found: "$filename"');
+    if (file == null) throw Exception('"$filename" not found in module');
 
     return file;
   }
